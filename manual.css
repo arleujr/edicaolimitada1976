@@ -24,3 +24,11 @@
 .look-card .look-grid{grid-template-columns:minmax(0,260px) minmax(0,1fr);max-width:630px;margin-inline:auto}
 .look-card img{height:350px;object-fit:contain;background:#f0dfc5}
 @media(max-width:560px){.look-card .look-grid{grid-template-columns:1fr;text-align:center}.look-card img{height:280px}}
+
+.acessorios { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px 15px; margin-top:16px; text-align:left }
+.acessorios figure { margin:0 }
+.acessorios img { display:block; width:100%; height:clamp(88px,14vw,148px); object-fit:contain; border-radius:8px; background:#ecd2a2 }
+.acessorios figcaption { margin-top:6px; font-size:.94rem; line-height:1.35 }
+.acessorios strong { display:block }
+.carousel-track { align-items:flex-start }
+@media(max-width:560px){.acessorios{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
