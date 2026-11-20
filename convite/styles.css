@@ -1,0 +1,373 @@
+:root{
+  --p:0;
+  --mx:0;
+  --my:0;
+  --title-opacity:1;
+  --title-scale:1;
+  --title-y:0px;
+  --rgb:0px;
+  --glow:0.78;
+  --scene-brightness:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#05000c;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{overflow-x:hidden}
+button{font:inherit}
+
+.benjamim-scroll{height:300vh;position:relative;background:#05000c}
+.benjamim-stage{
+  position:sticky;top:0;width:100vw;height:100vh;height:100svh;overflow:hidden;
+  isolation:isolate;background:#060012;cursor:default;
+}
+.fallback-bg{
+  position:absolute;inset:-5%;z-index:-20;
+  background:
+    radial-gradient(circle at 51% 53%,rgba(255,54,213,.24),transparent 24%),
+    radial-gradient(circle at 20% 28%,rgba(47,246,255,.17),transparent 30%),
+    radial-gradient(circle at 79% 24%,rgba(87,28,255,.20),transparent 30%),
+    linear-gradient(160deg,#050010 0%,#140028 43%,#06122c 100%);
+  transform:scale(1.08);
+}
+.bg-stack{position:absolute;inset:-2.5%;z-index:-15;filter:brightness(var(--scene-brightness)) saturate(1.08)}
+.bg-layer{position:absolute;inset:0;background-image:url('../assets/fundo.webp');background-position:center;background-size:cover;background-repeat:no-repeat;will-change:transform,filter,opacity}
+.bg-base{
+  /* Sem zoom: o fundo apenas respira lateral/verticalmente com o mouse. */
+  transform:translate(calc(var(--mx) * -7px),calc(var(--my) * -5px));
+  filter:contrast(1.035) saturate(1.05);
+}
+.bg-red{mix-blend-mode:screen;opacity:calc(.055 + var(--p)*.04);filter:sepia(1) saturate(8) hue-rotate(298deg);transform:translate(calc(var(--mx) * -10px - var(--rgb)),calc(var(--my) * -7px + 1px));}
+.bg-cyan{mix-blend-mode:screen;opacity:calc(.045 + var(--p)*.035);filter:sepia(1) saturate(8) hue-rotate(116deg);transform:translate(calc(var(--mx) * -4px + var(--rgb)),calc(var(--my) * -3px - 1px));}
+
+
+/* ==========================================================
+   PALMEIRAS / TELA INICIAL — V8
+   A referência NÃO joga uma árvore isolada contra a câmera.
+   Ela constrói um "corredor": árvores pequenas nascem perto do
+   centro/fundo, crescem enquanto se abrem para os lados e novas
+   árvores aparecem atrás. O JS controla a perspectiva para que
+   o loop possa congelar exatamente no frame do PLAY.
+   ========================================================== */
+.palm-stream{
+  position:absolute;
+  inset:0;
+  z-index:-7;
+  overflow:hidden;
+  pointer-events:none;
+  perspective:900px;
+  transform-style:preserve-3d;
+}
+.moving-palm{
+  position:absolute;
+  /* ponto-base calibrado nas duas palmeiras existentes do fundo */
+  bottom:26.1%;
+  width:clamp(98px,10vw,188px);
+  height:auto;
+  opacity:0;
+  transform-origin:50% 55%;
+  will-change:transform,opacity,filter;
+  backface-visibility:hidden;
+  filter:saturate(1.07) contrast(1.04) drop-shadow(0 0 6px rgba(255,43,220,.24));
+  /* sem screen: mantém o tronco cheio, como recorte fotográfico da referência */
+  mix-blend-mode:normal;
+}
+.palm-left{left:31.8%}
+.palm-right{right:31.7%}
+
+.statue-layer{position:absolute;inset:0;z-index:-9;pointer-events:none;overflow:hidden}
+.statue{position:absolute;left:50%;top:58.4%;width:clamp(360px,34vw,520px);height:auto;will-change:transform,opacity,filter;pointer-events:none;user-select:none;transform-origin:50% 68%;}
+.statue-main{opacity:.98;filter:drop-shadow(0 0 18px rgba(255,65,219,.18)) drop-shadow(0 12px 32px rgba(6,0,24,.42));mix-blend-mode:normal}
+.statue-echo{opacity:0;filter:drop-shadow(0 0 12px rgba(255,65,219,.11)) drop-shadow(0 8px 24px rgba(6,0,24,.28));mix-blend-mode:screen}
+
+.popup-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}
+.retro-popup{
+  position:absolute;
+  height:auto;
+  opacity:0;
+  transform-origin:50% 50%;
+  will-change:transform,opacity,filter;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(0 14px 24px rgba(1,0,14,.42)) drop-shadow(0 0 9px rgba(83,245,255,.13));
+}
+.popup-paint{
+  right:1.8vw;
+  bottom:1.5vh;
+  width:clamp(170px,18vw,295px);
+  aspect-ratio:1051 / 1228;
+  transform-origin:100% 100%;
+}
+.popup-paint-shell{height:auto}
+.paint-state{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+}
+.paint-pink{opacity:1}
+.paint-blue,.paint-yellow{opacity:0}
+.paint-cursor{
+  position:absolute;
+  left:0;
+  top:0;
+  width:clamp(14px,1.25vw,21px);
+  height:auto;
+  opacity:0;
+  z-index:4;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(1px 2px 0 rgba(0,0,0,.85));
+  transform-origin:0 0;
+  will-change:left,top,transform,opacity;
+}
+.popup-exe{
+  left:9.2vw;
+  bottom:8.5vh;
+  width:clamp(155px,15.5vw,255px);
+  transform-origin:0% 100%;
+}
+.popup-message{
+  right:5.8vw;
+  top:28.5vh;
+  width:clamp(170px,17vw,280px);
+  transform-origin:100% 50%;
+}
+.popup-media{
+  left:13.4vw;
+  top:14vh;
+  width:clamp(155px,14.5vw,250px);
+  transform-origin:0% 0%;
+}
+.flight-actors{position:absolute;inset:0;z-index:16;pointer-events:none;overflow:hidden}
+.ufo,.hummingbird{position:absolute;will-change:transform,filter;pointer-events:none;user-select:none}
+.ufo{top:9%;width:clamp(84px,10vw,140px);opacity:.96;mix-blend-mode:screen;filter:drop-shadow(0 0 14px rgba(255,78,224,.34)) drop-shadow(0 0 8px rgba(87,247,255,.22))}
+.ufo-left{left:5.5%}
+.ufo-right{right:5.5%}
+.hummingbird{left:0;top:0;width:clamp(84px,9vw,128px);opacity:.96;filter:drop-shadow(0 0 12px rgba(255,39,211,.30)) drop-shadow(0 0 9px rgba(87,247,255,.25))}
+.dolphin-layer{position:absolute;inset:0;pointer-events:none;z-index:13;overflow:hidden}
+.dolphin{position:absolute;top:0;left:0;width:clamp(140px,17vw,250px);will-change:transform,opacity,filter;pointer-events:none;user-select:none;opacity:.98;mix-blend-mode:screen;filter:drop-shadow(0 0 14px rgba(87,247,255,.22)) drop-shadow(0 0 8px rgba(255,76,219,.12))}
+.dolphin-left{transform-origin:50% 50%}
+.dolphin-right{transform-origin:50% 50%}
+.globe-group{position:absolute;inset:0;pointer-events:none;z-index:14;overflow:hidden}
+.globe{position:absolute;top:0;left:0;width:clamp(92px,10vw,138px);will-change:transform,filter;pointer-events:none;user-select:none;opacity:.97;mix-blend-mode:screen;filter:drop-shadow(0 0 16px rgba(255,76,219,.22)) drop-shadow(0 0 10px rgba(87,247,255,.18))}
+.globe-left{}
+.globe-right{}
+.flamingo-group{position:absolute;left:0;bottom:-14.5vh;width:0;height:0;pointer-events:none;z-index:17}
+.flamingo{position:absolute;left:0;bottom:0;width:clamp(138px,15vw,230px);transform-origin:50% 55%;will-change:transform,opacity,filter;pointer-events:none;user-select:none;opacity:0}
+.flamingo-main{opacity:.98;filter:drop-shadow(0 0 14px rgba(255,48,208,.28)) drop-shadow(0 0 10px rgba(93,244,255,.16))}
+.flamingo-echo{opacity:0;mix-blend-mode:normal;filter:drop-shadow(0 0 8px rgba(255,48,208,.14))}
+.flight-guide{position:absolute;inset:0;z-index:-1;opacity:0;pointer-events:none}
+
+/* Ao clicar PLAY, TODA a animação ambiente CSS também para no frame atual. */
+.benjamim-stage.started .noise,
+.benjamim-stage.started .vhs-roll,
+.benjamim-stage.started .neon-haze,
+.benjamim-stage.started .tracking-bar i,
+.benjamim-stage.started .microcopy{
+  animation-play-state:paused!important;
+}
+
+#fxCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:-4;pointer-events:none;mix-blend-mode:screen;opacity:.76}
+.neon-haze{position:absolute;border-radius:50%;filter:blur(55px);mix-blend-mode:screen;pointer-events:none;z-index:-6;opacity:.17;animation:hazeFloat 9s ease-in-out infinite alternate}
+.haze-a{width:38vw;height:22vw;left:-12vw;top:32%;background:rgba(255,0,190,.7)}
+.haze-b{width:34vw;height:24vw;right:-10vw;top:20%;background:rgba(0,229,255,.55);animation-delay:-4s}
+@keyframes hazeFloat{to{transform:translate3d(4vw,-2vh,0) scale(1.12)}}
+
+.light-sweep{position:absolute;z-index:2;inset:-20%;pointer-events:none;mix-blend-mode:screen;opacity:calc(.04 + var(--p)*.11);background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.32) 49%,rgba(83,255,255,.16) 51%,transparent 59%);transform:translateX(calc(-55% + var(--p)*115%)) rotate(-4deg);filter:blur(12px)}
+.vhs-roll{position:absolute;z-index:8;left:0;right:0;height:13vh;top:-18vh;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.05),rgba(112,248,255,.09),transparent);mix-blend-mode:screen;filter:blur(2px);opacity:.8;animation:vhsRoll 7.2s linear infinite;pointer-events:none}
+@keyframes vhsRoll{to{transform:translateY(138vh)}}
+.scanlines{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:.22;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.05) 0px,rgba(255,255,255,.05) 1px,transparent 2px,transparent 4px);mix-blend-mode:overlay}
+.noise{position:absolute;inset:-50%;z-index:21;pointer-events:none;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");animation:noiseShift .17s steps(2) infinite;mix-blend-mode:soft-light}
+@keyframes noiseShift{0%{transform:translate(0,0)}25%{transform:translate(3%,2%)}50%{transform:translate(-2%,3%)}75%{transform:translate(1%,-2%)}100%{transform:translate(-3%,-1%)}}
+.edge-vignette{position:absolute;inset:0;z-index:25;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(2,0,13,.14) 67%,rgba(0,0,0,.68) 100%);box-shadow:inset 0 0 8vw rgba(3,0,10,.6)}
+
+.glitch-slices{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.glitch-slice{position:absolute;left:-2%;width:104%;height:var(--h);top:var(--t);background-image:url('../assets/fundo.webp');background-size:cover;background-position:center;opacity:0;mix-blend-mode:screen;filter:saturate(1.35) contrast(1.15);transform:translateX(var(--dx));clip-path:inset(var(--t) 0 calc(100% - var(--t) - var(--h)) 0)}
+.benjamim-stage.glitching .glitch-slice{opacity:.22}
+.benjamim-stage.glitching .glitch-slice:nth-child(2n){filter:hue-rotate(80deg) saturate(1.7)}
+
+.title-wrap{position:absolute;z-index:30;left:50%;top:55%;transform:translate(-50%,-50%) translateY(var(--title-y)) scale(var(--title-scale));opacity:var(--title-opacity);display:flex;flex-direction:column;align-items:center;text-align:center;will-change:transform,opacity;filter:drop-shadow(0 0 24px rgba(255,33,214,.2));user-select:none}
+.play-button{order:2;display:flex;align-items:center;justify-content:center;gap:.55em;margin:.78rem 0 0;padding:.35rem .86rem;border:0;background:rgba(4,0,18,.18);color:#ffe767;letter-spacing:.25em;font-size:clamp(13px,1.05vw,18px);font-weight:900;cursor:pointer;text-shadow:-1px 0 #ff2bd6,1px 0 #3ef7ff,0 0 9px rgba(255,224,93,.8);transition:transform .18s ease,filter .18s ease,background .18s ease;position:relative;border-radius:2px}
+.play-button::before{content:"";position:absolute;inset:0;border-top:1px solid rgba(76,251,255,.48);border-bottom:1px solid rgba(255,49,213,.48);transform:scaleX(.72);transition:transform .22s ease;box-shadow:0 0 12px rgba(255,49,213,.18)}
+.play-button:hover{transform:scale(1.06);background:rgba(21,2,41,.42);filter:brightness(1.2)}
+.play-button:hover::before{transform:scaleX(1)}
+.play-bracket{color:#5ef7ff;font-size:.88em;text-shadow:0 0 9px #42efff}
+.play-label{position:relative}
+.play-label::before,.play-label::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;opacity:.32}
+.play-label::before{color:#00eeff;transform:translateX(-1px);clip-path:inset(0 0 53% 0)}
+.play-label::after{color:#ff28ca;transform:translateX(1px);clip-path:inset(52% 0 0 0)}
+
+/* Tipografia BEIJAMIM restaurada da V1.
+   Sem caixa/moldura externa: o neon existe na própria palavra. */
+.title-frame{
+  order:1;
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  padding:.10em .18em .16em;
+  isolation:isolate;
+  cursor:default;
+}
+.title-frame::before,
+.title-frame::after{
+  content:none;
+}
+
+.benjamim-title{
+  position:relative;
+  margin:0;
+  font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;
+  font-style:italic;
+  font-size:clamp(52px,7.2vw,108px);
+  line-height:.86;
+  letter-spacing:.025em;
+  font-weight:900;
+  color:#fff8d2;
+  -webkit-text-stroke:1px rgba(255,255,255,.25);
+  text-shadow:
+    4px 4px 0 #ff2bd6,
+    8px 8px 0 #5130d8,
+    -3px -2px 0 #3cf6ff,
+    0 0 22px rgba(255,43,214,.72);
+  will-change:transform,filter;
+}
+/* A duplicata só aparece em faixas horizontais no hover, como na V1. */
+.benjamim-title::after{
+  content:attr(data-text);
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  overflow:hidden;
+  color:transparent;
+  -webkit-text-stroke:1px #3cf6ff;
+  transform:translateX(0);
+  opacity:0;
+  pointer-events:none;
+}
+.benjamim-title::before{content:none;}
+
+@media (hover:hover) and (pointer:fine){
+  /* O mesmo glitch acontece sobre BEIJAMIM ao passar o mouse no título OU no PLAY. */
+  .title-frame:hover .benjamim-title,
+  .title-wrap.play-hover .benjamim-title{
+    filter:brightness(1.08);
+  }
+  .title-frame:hover .benjamim-title::after,
+  .title-wrap.play-hover .benjamim-title::after{
+    animation:titleGlitchV1 .42s steps(2,end) infinite;
+  }
+
+  /* PLAY reage só como gatilho visual; o glitch principal continua em BEIJAMIM. */
+  .title-wrap.play-hover .play-button{
+    text-shadow:-2px 0 #ff2bd6,2px 0 #3ef7ff,0 0 11px rgba(255,224,93,.9);
+  }
+}
+@keyframes titleGlitchV1{
+  0%,100%{
+    clip-path:inset(8% 0 72% 0);
+    transform:translateX(-4px);
+    opacity:.85;
+  }
+  50%{
+    clip-path:inset(58% 0 15% 0);
+    transform:translateX(6px);
+    opacity:.75;
+  }
+}
+.microcopy{margin:.95rem 0 0;color:rgba(202,247,255,.78);font-family:"Courier New",monospace;font-size:clamp(8px,.6vw,10px);letter-spacing:.32em;text-shadow:0 0 8px #42eaff;animation:microBlink 2.2s steps(2) infinite}
+@keyframes microBlink{50%{opacity:.42}}
+
+.tracking{position:absolute;z-index:35;left:3.2vw;bottom:3vh;display:flex;align-items:center;gap:.7rem;color:rgba(196,250,255,.48);font:8px/1 "Courier New",monospace;letter-spacing:.19em}
+.tracking-bar{width:88px;height:3px;background:rgba(255,255,255,.08);overflow:hidden;box-shadow:0 0 8px rgba(60,245,255,.2)}
+.tracking-bar i{display:block;height:100%;width:33%;background:linear-gradient(90deg,#ff26d5,#53fbff);animation:track 1.7s linear infinite}
+@keyframes track{from{transform:translateX(-120%)}to{transform:translateX(320%)}}
+.corner-code{position:absolute;z-index:34;color:rgba(190,246,255,.34);font:8px/1.5 "Courier New",monospace;letter-spacing:.13em;text-shadow:0 0 8px rgba(39,230,255,.26);pointer-events:none}
+.corner-code-a{left:3.2vw;top:3.8vh}.corner-code-b{right:3.2vw;top:3.8vh;text-align:right}
+.start-flash{position:absolute;inset:0;z-index:60;pointer-events:none;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.8),rgba(95,246,255,.32) 20%,rgba(255,26,204,.14) 42%,transparent 67%);mix-blend-mode:screen}
+.start-flash.fire{animation:startFlash .5s ease-out}
+@keyframes startFlash{0%{opacity:0}10%{opacity:.74}36%{opacity:.16}54%{opacity:.52}100%{opacity:0}}
+
+
+/* Interferência VHS de tela inteira — sem zoom do fundo. */
+.screen-interference{
+  position:absolute;inset:0;z-index:23;pointer-events:none;overflow:hidden;
+  opacity:.10;mix-blend-mode:screen;
+}
+.screen-interference::before,
+.screen-interference::after{
+  content:"";position:absolute;left:-4%;width:108%;opacity:0;
+  will-change:transform,opacity,clip-path;
+}
+.screen-interference::before{
+  inset:-4% -4%;
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0 8px,
+      rgba(255,255,255,.09) 9px,
+      transparent 10px 22px),
+    linear-gradient(90deg,rgba(255,35,214,.14),transparent 26%,rgba(57,244,255,.13) 73%,transparent);
+}
+.screen-interference::after{
+  top:0;height:100%;
+  background:linear-gradient(to bottom,
+    transparent 0 19%,rgba(87,247,255,.22) 19.3% 19.9%,transparent 20.2% 48%,
+    rgba(255,41,207,.20) 48.1% 49.0%,transparent 49.3% 76%,
+    rgba(255,255,255,.13) 76.2% 76.8%,transparent 77.2%);
+}
+
+.benjamim-stage.hard-glitch .screen-interference{opacity:.58}
+.benjamim-stage.hard-glitch .screen-interference::before{
+  opacity:.75;animation:screenStaticHit .12s steps(2,end) 1;
+}
+.benjamim-stage.hard-glitch .screen-interference::after{
+  opacity:.9;animation:screenTearHit .12s steps(2,end) 1;
+}
+.benjamim-stage.hard-glitch .bg-stack{
+  animation:bgTearHit .12s steps(2,end) 1;
+}
+.benjamim-stage.hard-glitch .scanlines{opacity:.48}
+.benjamim-stage.hard-glitch .noise{opacity:.22}
+
+@keyframes screenStaticHit{
+  0%{transform:translateX(-8px);clip-path:inset(2% 0 73% 0)}
+  33%{transform:translateX(12px);clip-path:inset(40% 0 28% 0)}
+  66%{transform:translateX(-5px);clip-path:inset(71% 0 6% 0)}
+  100%{transform:translateX(0);clip-path:inset(0)}
+}
+@keyframes screenTearHit{
+  0%{transform:translateX(11px);filter:hue-rotate(35deg)}
+  42%{transform:translateX(-13px);filter:hue-rotate(-28deg)}
+  76%{transform:translateX(7px);filter:brightness(1.45)}
+  100%{transform:translateX(0);filter:none}
+}
+@keyframes bgTearHit{
+  0%{transform:translateX(-4px);filter:brightness(1.22) saturate(1.3)}
+  35%{transform:translateX(7px);filter:brightness(.92) saturate(1.18)}
+  70%{transform:translateX(-2px);filter:brightness(1.12) saturate(1.28)}
+  100%{transform:translateX(0);filter:brightness(var(--scene-brightness)) saturate(1.08)}
+}
+
+/* Um rasgo fino que aparece em alturas aleatórias definidas pelo JS. */
+.glitch-bar{
+  position:absolute;z-index:24;left:-3%;width:106%;top:var(--bar-y,50%);height:var(--bar-h,4px);
+  pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:linear-gradient(90deg,
+    transparent 0 8%,rgba(48,242,255,.45) 13% 31%,rgba(255,255,255,.26) 37% 54%,rgba(255,31,204,.5) 62% 84%,transparent 92%);
+  box-shadow:0 0 11px rgba(95,238,255,.32),0 0 15px rgba(255,28,207,.22);
+  transform:translateX(var(--bar-x,0px));
+}
+.benjamim-stage.hard-glitch .glitch-bar{opacity:.82}
+
+
+
+
+@media(max-width:720px){
+  .moving-palm{bottom:27.2%;width:clamp(78px,18vw,126px)}
+  .palm-left{left:25.5%}.palm-right{right:25.5%}
+}
+@media(prefers-reduced-motion:reduce){.noise,.vhs-roll,.neon-haze,.tracking-bar i,.microcopy,.moving-palm{animation:none!important}.moving-palm{opacity:.36;transform:scale(.22)}}
+
+.back{position:fixed;z-index:100;top:14px;left:14px;padding:10px 16px;border-radius:100px;background:#2b140feb;color:#ffe5b9;border:1px solid #ab683d;text-decoration:none;font:15px system-ui}.benjamim-title{font-size:clamp(28px,8vw,120px);color:#ffe1a6}.benjamim-stage{background:#2b140f}.intro-ambient{filter:sepia(.23)}@media(prefers-reduced-motion:reduce){.intro-ambient,.glitch-slices,.start-flash,.screen-interference,.vhs-roll,.noise,.neon-haze,#fxCanvas{display:none!important}*{animation:none!important;transition:none!important}}

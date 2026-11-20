@@ -1,0 +1,13 @@
+EDIÇÃO LIMITADA — JAQUELINE GUIDUCCI
+
+Extraia o ZIP e abra a pasta edicao-limitada no VS Code.
+Para testar, abra index.html no navegador ou use o Live Server.
+O index.html é a home com a animação do v4.
+O endereço e o mapa estão em local.html. O formulário está incorporado em presenca.html e precisa de internet.
+Não é necessário instalar Node.js para abrir o site.
+
+Páginas do site
+index.html — abertura animada
+manual.html — Manual do Convidado
+local.html — localização
+presenca.html — confirmação de presença
