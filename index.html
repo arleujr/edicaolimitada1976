@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#2e1007">
   <title>Edição Limitada 1976 · Jaqueline Guiducci</title>
   <meta name="description" content="Festa anos 70 de Jaqueline Guiducci. Sábado, 19 de dezembro, às 16h no Sítio Calmaria, em Ubá.">
-  <link rel="stylesheet" href="home.css?v=21">
-  <script src="musica.js" defer></script>
+  <link rel="stylesheet" href="home.css?v=22">
+  <script src="musica.js?v=22" defer></script>
 </head>
 <body class="effects-playing">
   <main class="convite">
@@ -16,7 +16,7 @@
       <div class="dance-lights" aria-hidden="true"></div>
       <div class="extra-reflections" aria-hidden="true"><i></i><i></i><i></i></div>
       <audio id="trilha" src="assets/disco-1976.mp3" autoplay loop preload="auto"></audio>
-      <button class="vinil" id="som" type="button" aria-label="Tocar música"><img src="assets/vinil.webp" alt=""><span>Tocar música</span></button>
+      <img class="vinil" src="assets/vinil.webp" alt="">
       <img class="fita" src="assets/fita.webp" alt="">
       <div class="identidade">
         <h1><img class="assinatura" src="assets/nome.webp" alt="Jaqueline Guiducci"></h1>
@@ -39,8 +39,9 @@
       <nav aria-label="Informações e confirmação">
         <a href="manual.html">Manual do Convidado</a>
         <a href="local.html">Local</a>
-        <div class="resposta"><a class="confirmar" href="presenca.html">Confirmar presença</a><small>Até 10 de dezembro</small></div>
+        <div class="resposta"><a class="confirmar" href="presenca.html">Confirmar presença</a><small>Até 05 de dezembro</small></div>
       </nav>
+      <button id="som" type="button" aria-controls="trilha"><span>Tocar música</span></button>
     </footer>
   </main>
 </body>

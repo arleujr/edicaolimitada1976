@@ -22,7 +22,10 @@ controle.addEventListener("click", () => {
   if (trilha.paused) tocar();
   else trilha.pause();
 });
-document.addEventListener("click", evento => {
-  if (aguardaToque && !controle.contains(evento.target)) tocar();
-});
+function tentarNoGesto(evento) {
+  if (aguardaToque && trilha.paused && !controle.contains(evento.target)) tocar();
+}
+for (const tipo of ["pointerup", "keydown", "click"]) {
+  document.addEventListener(tipo, tentarNoGesto, { passive:true });
+}
 tocar();
