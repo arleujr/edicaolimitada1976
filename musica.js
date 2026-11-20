@@ -1,31 +1,51 @@
 const trilha = document.querySelector("#trilha");
 const controle = document.querySelector("#som");
-const legenda = controle.querySelector("span");
-let aguardaToque = true;
+const capa = document.querySelector("#capa");
+const abrir = document.querySelector("#abrir");
+const aviso = document.querySelector("#aviso-som");
+const semSom = document.querySelector("#sem-som");
+let espera;
 
-function mostrar(texto) {
-  legenda.textContent = texto;
-  controle.setAttribute("aria-label", texto);
+function mostrarFalha() {
+  clearTimeout(espera);
+  abrir.textContent = "Tentar novamente";
+  aviso.textContent = "A música não começou. Você pode tentar de novo ou abrir o convite sem som.";
+  semSom.hidden = false;
 }
-function tocar() {
-  trilha.play().catch(() => {
-    if (trilha.paused) mostrar("Tocar música");
-  });
+
+function atualizarControle() {
+  controle.querySelector("span").textContent = trilha.paused ? "Tocar música" : "Pausar música";
 }
+
 trilha.addEventListener("playing", () => {
-  aguardaToque = false;
-  mostrar("Pausar música");
+  clearTimeout(espera);
+  if (capa.open) capa.close();
+  atualizarControle();
 });
-trilha.addEventListener("pause", () => mostrar("Tocar música"));
+trilha.addEventListener("pause", atualizarControle);
+
+abrir.addEventListener("click", () => {
+  clearTimeout(espera);
+  aviso.textContent = "Carregando a música…";
+  espera = setTimeout(mostrarFalha, 10000);
+  if (trilha.error) trilha.load();
+  trilha.play().catch(mostrarFalha);
+});
+semSom.addEventListener("click", () => {
+  clearTimeout(espera);
+  trilha.pause();
+  capa.close();
+});
 controle.addEventListener("click", () => {
-  aguardaToque = false;
-  if (trilha.paused) tocar();
-  else trilha.pause();
+  if (!trilha.paused) return trilha.pause();
+  if (trilha.error) trilha.load();
+  trilha.play().catch(() => {
+    capa.showModal();
+    mostrarFalha();
+  });
 });
-function tentarNoGesto(evento) {
-  if (aguardaToque && trilha.paused && !controle.contains(evento.target)) tocar();
-}
-for (const tipo of ["pointerup", "keydown", "click"]) {
-  document.addEventListener(tipo, tentarNoGesto, { passive:true });
-}
-tocar();
+
+trilha.play().catch(erro => {
+  capa.showModal();
+  if (erro.name !== "NotAllowedError") mostrarFalha();
+});

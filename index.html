@@ -6,10 +6,18 @@
   <meta name="theme-color" content="#2e1007">
   <title>Edição Limitada 1976 · Jaqueline Guiducci</title>
   <meta name="description" content="Festa anos 70 de Jaqueline Guiducci. Sábado, 19 de dezembro, às 16h no Sítio Calmaria, em Ubá.">
-  <link rel="stylesheet" href="home.css?v=22">
-  <script src="musica.js?v=22" defer></script>
+  <link rel="stylesheet" href="home.css?v=23">
+  <script src="musica.js?v=23" defer></script>
 </head>
 <body class="effects-playing">
+  <dialog id="capa" aria-label="Convite de Jaqueline Guiducci">
+    <div class="capa-cartao">
+      <img src="assets/nome.webp" alt="Jaqueline Guiducci">
+      <button id="abrir" type="button">Abrir convite</button>
+      <p id="aviso-som" role="status"></p>
+      <button id="sem-som" type="button" hidden>Continuar sem música</button>
+    </div>
+  </dialog>
   <main class="convite">
     <div class="cena">
       <div class="refletores" aria-hidden="true"><i></i><i></i></div>

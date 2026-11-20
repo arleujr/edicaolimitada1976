@@ -119,3 +119,11 @@ nav a:focus-visible { outline:3px solid #ffdb87; outline-offset:3px }
 #som::before { content:"♫"; margin-right:.45em }
 #som:hover span { text-decoration:underline }
 #som:focus-visible { outline:2px solid #ffdb87 }
+
+#capa { color:#ffe1ac; border:1px solid #bf824c; border-radius:22px; padding:0; background:#35170b url("assets/fundo.webp") center / cover; width:min(86vw,410px); box-shadow:0 18px 85px #100500aa }
+#capa::backdrop { background:#201008 }
+.capa-cartao { padding:clamp(28px,6vw,56px) 24px; text-align:center }
+.capa-cartao img { display:block; width:85%; height:auto; margin:0 auto 28px }
+#abrir { border:0; border-radius:30px; background:#ffd191; color:#321406; font:inherit; font-weight:bold; padding:14px 32px; cursor:pointer }
+#aviso-som:not(:empty) { margin:14px 0 0 }
+#sem-som { color:inherit; font:inherit; text-decoration:underline; background:transparent; border:0; padding:12px; cursor:pointer }
